@@ -1,0 +1,48 @@
+version: "3.7"
+services:
+  yaichi:
+    image: mtsmfm/yaichi:1.2.0
+    ports:
+      - 80:3000
+      - 35729:35729
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  web: &web
+    container_name: have-it-failed
+    build:
+      context: .
+      args:
+        - LOCAL_BUILD=true
+    volumes:
+      - .:/app:cached
+      - home:/home/app
+      - tmp:/app/tmp
+      - vendor:/vendor
+    environment:
+      - DATABASE_URL=postgres://postgres:@db
+      - PORT=3000
+      - HOST=0.0.0.0
+      - WEBPACKER_DEV_SERVER_HOST=webpack-dev-server
+      - WEBPACKER_DEV_SERVER_PORT=3000
+      - WEBPACKER_DEV_SERVER_PUBLIC=have-it-failed-webpack-dev-server.localhost
+    tty: true
+    stdin_open: true
+    depends_on:
+      - db
+
+  webpack-dev-server:
+    <<: *web
+    container_name: have-it-failed-webpack-dev-server
+    command: bin/webpack-dev-server
+
+  db:
+    image: postgres:10-alpine
+    volumes:
+      - db:/var/lib/postgresql/data
+
+volumes:
+  home:
+  vendor:
+  tmp:
+  db:
