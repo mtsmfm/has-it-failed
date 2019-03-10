@@ -30,6 +30,8 @@ services:
     stdin_open: true
     depends_on:
       - db
+    env_file:
+      - app.env
 
   webpack-dev-server:
     <<: *web
