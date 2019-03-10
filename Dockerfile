@@ -17,22 +17,22 @@ WORKDIR /app
 
 USER app
 
-# COPY --chown=app Gemfile Gemfile.lock ./
+COPY --chown=app Gemfile Gemfile.lock ./
 
-# RUN if [ -z "$LOCAL_BUILD" ]; then \
-#   bundle install \
-#   ;fi
+RUN if [ -z "$LOCAL_BUILD" ]; then \
+  bundle install \
+  ;fi
 
-# COPY --chown=app package.json yarn.lock ./
+COPY --chown=app package.json yarn.lock ./
 
-# RUN if [ -z "$LOCAL_BUILD" ]; then \
-#   yarn install \
-#   ;fi
+RUN if [ -z "$LOCAL_BUILD" ]; then \
+  yarn install \
+  ;fi
 
-# COPY --chown=app . ./
+COPY --chown=app . ./
 
-# RUN if [ -z "$LOCAL_BUILD" ]; then \
-#   SECRET_KEY_BASE=`bin/rails secret` RAILS_ENV=production bin/rails assets:precompile \
-#   ;fi
+RUN if [ -z "$LOCAL_BUILD" ]; then \
+  SECRET_KEY_BASE=`bin/rails secret` RAILS_ENV=production bin/rails assets:precompile \
+  ;fi
 
 CMD ["bin/rails", "server", "-b", "0.0.0.0"]

@@ -1,0 +1,36 @@
+<%= form_with url: root_path, method: :get, local: true do |f| %>
+  <%= f.text_field :q, value: @test_method, placeholder: 'test_method_name' %>
+  <%= f.submit 'Search', name: nil %>
+<% end %>
+
+<% if @test_method.present? %>
+  <% if @failed_jobs.exists? %>
+    YES, <%= @test_method %> failed:
+
+    <table class="table table-bordered">
+      <tr>
+        <th>Test Class</th>
+        <th>Test Method</th>
+        <th>Message</th>
+        <th>Command</th>
+        <th>TravisCI build URL</th>
+      </tr>
+      <% @failed_jobs.each do |failed_job| %>
+        <tr>
+          <% url = "https://travis-ci.org/rails/rails/jobs/#{failed_job.original_id}" %>
+          <% failed_job.parse_result['failedTests'].each do |failed_test| %>
+            <% failed_test['results'].select {|r| r['method'] == @test_method }.each do |result| %>
+              <td><%= result['testClass'] %></td>
+              <td><%= result['method'] %></td>
+              <td><pre><%= result['message'] %></pre></td>
+              <td><pre><%= failed_test['command'] %></pre></td>
+              <td><%= link_to url, url, target: :_blank %></td>
+            <% end %>
+          <% end %>
+        </tr>
+      <% end %>
+    </table>
+  <% else %>
+    NO
+  <% end %>
+<%- end %>

@@ -1,0 +1,2 @@
+class FailedJob < ApplicationRecord
+end
