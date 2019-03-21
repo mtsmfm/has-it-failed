@@ -9,7 +9,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
   web: &web
-    container_name: have-it-failed
+    container_name: has-it-failed
     build:
       context: .
       args:
@@ -25,7 +25,7 @@ services:
       - HOST=0.0.0.0
       - WEBPACKER_DEV_SERVER_HOST=webpack-dev-server
       - WEBPACKER_DEV_SERVER_PORT=3000
-      - WEBPACKER_DEV_SERVER_PUBLIC=have-it-failed-webpack-dev-server.localhost
+      - WEBPACKER_DEV_SERVER_PUBLIC=has-it-failed-webpack-dev-server.localhost
     tty: true
     stdin_open: true
     depends_on:
@@ -35,7 +35,7 @@ services:
 
   webpack-dev-server:
     <<: *web
-    container_name: have-it-failed-webpack-dev-server
+    container_name: has-it-failed-webpack-dev-server
     command: bin/webpack-dev-server
 
   db:
