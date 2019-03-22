@@ -6,7 +6,21 @@
     "@rails/activestorage": "^6.0.0-alpha",
     "@rails/ujs": "^6.0.0-alpha",
     "@rails/webpacker": "^4.0.2",
-    "turbolinks": "^5.2.0"
+    "@types/node": "^11.11.0",
+    "@types/pegjs": "^0.10.1",
+    "@types/request-promise": "^4.1.42",
+    "pegjs": "^0.10.0",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.4",
+    "ts-node": "^8.0.3",
+    "turbolinks": "^5.2.0",
+    "typescript": "^3.3.3333"
+  },
+  "scripts": {
+    "parser:build": "yarn parser:build:travis_result && yarn parser:build:rails_ci",
+    "parser:build:travis_result": "yarn pegjs --format globals --export-var TravisResultParser --output parser/out/travis_result.js parser/travis_result.pegjs",
+    "parser:build:rails_ci": "yarn pegjs --format globals --export-var RailsCiParser --output parser/out/rails_ci.js parser/rails_ci.pegjs",
+    "parser:test": "ts-node parser/test.ts"
   },
   "version": "0.1.0",
   "devDependencies": {
