@@ -16,21 +16,38 @@
         <th>TravisCI build URL</th>
       </tr>
       <% @failed_jobs.each do |failed_job| %>
-        <tr>
-          <% url = "https://travis-ci.org/rails/rails/jobs/#{failed_job.original_id}" %>
-          <% failed_job.parse_result['failedTests'].each do |failed_test| %>
-            <% failed_test['results'].select {|r| r['method'] == @test_method }.each do |result| %>
+        <% url = "https://travis-ci.org/rails/rails/jobs/#{failed_job.original_id}" %>
+        <% failed_job.parse_result['failedTests'].each do |failed_test| %>
+          <% failed_test['results'].select {|r| r['method'] == @test_method }.each do |result| %>
+            <tr>
               <td><%= result['testClass'] %></td>
               <td><%= result['method'] %></td>
               <td><pre><%= result['message'] %></pre></td>
               <td><pre><%= failed_test['command'] %></pre></td>
               <td><%= link_to url, url, target: :_blank %></td>
-            <% end %>
+            </tr>
           <% end %>
-        </tr>
+        <% end %>
       <% end %>
     </table>
   <% else %>
     NO
   <% end %>
 <%- end %>
+
+<% if @most_failed_tests %>
+  <table class="table table-bordered">
+    <tr>
+      <th>Test Name</th>
+      <th>Failed Count</th>
+      <th>Detail</th>
+    </tr>
+    <% @most_failed_tests.each do |most_failed_test, failed_count| %>
+      <tr>
+        <td><%= most_failed_test['testClass'] %>#<%= most_failed_test['method'] %></td>
+        <td><%= failed_count %></td>
+        <td><%= link_to 'detail', root_path(q: most_failed_test['method']) %></td>
+      </tr>
+    <% end %>
+  </table>
+<% end %>
