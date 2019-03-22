@@ -1,24 +1,34 @@
-# README
+# Has it failed
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Demo application to use public dataset `rails-travis-result.rails_travis_result.jobs`.
 
-Things you may want to cover:
+https://has-it-failed.herokuapp.com
 
-* Ruby version
+For more information about this dataset, read https://github.com/mtsmfm/rails-ci-result-importer
 
-* System dependencies
+## How to develop
 
-* Configuration
+### Requirements
 
-* Database creation
+- Docker
+- Docker Compose
 
-* Database initialization
+### Steps
 
-* How to run the test suite
+```
+$ docker-compose build
+$ docker-compose run web bin/rails db:setup
+$ touch app.env
+$ $EDITOR app.env
+```
 
-* Services (job queues, cache servers, search engines, etc.)
+### Env vars
 
-* Deployment instructions
+- BIGQUERY_PROJECT: Project name to run SQL.
+- BIGQUERY_CREDENTIALS: Bigquery creatential to run SQL. Set JSON content.
 
-* ...
+### Import data
+
+```
+$ docker-compose run web bin/rails r 'ImportFailedJobsJob.perform_now(from: Time.zone.parse("2019-02-01"), to: Time.zone.parse("2019-03-01"))'
+```
