@@ -17,9 +17,11 @@ For more information about this dataset, read https://github.com/mtsmfm/rails-ci
 
 ```
 $ docker-compose build
-$ docker-compose run web bin/rails db:setup
+$ docker-compose run web bin/setup
 $ touch app.env
 $ $EDITOR app.env
+$ docker-compose up -d
+$ open localhost:80
 ```
 
 ### Env vars
