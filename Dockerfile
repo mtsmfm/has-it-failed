@@ -1,17 +1,22 @@
-FROM ruby:2.6.1-alpine
+FROM ruby:2.6.3-stretch
 
 ARG LOCAL_BUILD
 
-ENV BUNDLE_JOBS=4 RAILS_LOG_TO_STDOUT=true RAILS_SERVE_STATIC_FILES=true BUNDLE_PATH=/vendor/bundle LANG=C.UTF-8 LC_ALL=C.UTF-8
+ENV BUNDLE_JOBS=4 RAILS_LOG_TO_STDOUT=true RAILS_SERVE_STATIC_FILES=true BUNDLE_PATH=/vendor/bundle LANG=C.UTF-8 LC_ALL=C.UTF-8 HOME=/home/app SHELL=/bin/bash
 
-COPY --from=node:10.15.1-alpine /usr/local /usr/local
-COPY --from=node:10.15.1-alpine /opt /opt
+COPY --from=node:12.3.1-stretch /usr/local /usr/local
+COPY --from=node:12.3.1-stretch /opt /opt
 
-RUN apk update && apk add --no-cache build-base postgresql-dev tzdata less
+RUN \
+  echo 'deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main' > /etc/apt/sources.list.d/pgdg.list && \
+  wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
+  apt-get update && \
+  apt-get install --no-install-recommends -y less postgresql-client-10 zsh && \
+  curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh | zsh
 
-RUN adduser -u 1000 -D app
-RUN mkdir -p /app/tmp /vendor/bundle
-RUN chown -R app /app /vendor
+RUN useradd --create-home --user-group --uid 1000 app
+RUN mkdir -p /app /original $BUNDLE_PATH
+RUN chown -R app /app /original /vendor
 
 WORKDIR /app
 

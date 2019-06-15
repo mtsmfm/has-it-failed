@@ -15,10 +15,12 @@ services:
       args:
         - LOCAL_BUILD=true
     volumes:
-      - .:/app:cached
+      - .:/original:cached
+      - app:/app
       - home:/home/app
-      - tmp:/app/tmp
       - vendor:/vendor
+      - $HOME/.gitconfig:/home/app/.gitconfig:ro
+      - $HOME/.netrc:/home/app/.netrc:ro
     environment:
       - DATABASE_URL=postgres://postgres:@db
       - PORT=3000
@@ -44,7 +46,7 @@ services:
       - db:/var/lib/postgresql/data
 
 volumes:
+  app:
   home:
   vendor:
-  tmp:
   db:
