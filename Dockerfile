@@ -25,7 +25,7 @@ USER app
 COPY --chown=app Gemfile Gemfile.lock ./
 
 RUN if [ -z "$LOCAL_BUILD" ]; then \
-  bundle install \
+  bundle install --without development test\
   ;fi
 
 COPY --chown=app package.json yarn.lock ./
@@ -37,7 +37,8 @@ RUN if [ -z "$LOCAL_BUILD" ]; then \
 COPY --chown=app . ./
 
 RUN if [ -z "$LOCAL_BUILD" ]; then \
-  SECRET_KEY_BASE=`bin/rails secret` RAILS_ENV=production bin/rails assets:precompile \
+  export RAILS_ENV=production && \
+  SECRET_KEY_BASE=`bin/rails secret` bin/rails assets:precompile \
   ;fi
 
 CMD ["bin/rails", "server", "-b", "0.0.0.0"]
