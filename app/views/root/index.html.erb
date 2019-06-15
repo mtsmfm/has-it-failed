@@ -4,8 +4,8 @@
 <% end %>
 
 <% if @test_method.present? %>
-  <% if @failed_jobs.exists? %>
-    YES, <%= @test_method %> failed:
+  <% unless @failed_results.empty? %>
+    <h1>YES, <%= @test_method %> has failed:</h1>
 
     <table class="table table-bordered">
       <tr>
@@ -15,19 +15,15 @@
         <th>Command</th>
         <th>TravisCI build URL</th>
       </tr>
-      <% @failed_jobs.each do |failed_job| %>
-        <% url = "https://travis-ci.org/rails/rails/jobs/#{failed_job.original_id}" %>
-        <% failed_job.parse_result['failedTests'].each do |failed_test| %>
-          <% failed_test['results'].select {|r| r['method'] == @test_method }.each do |result| %>
-            <tr>
-              <td><%= result['testClass'] %></td>
-              <td><%= result['method'] %></td>
-              <td><pre><%= result['message'] %></pre></td>
-              <td><pre><%= failed_test['command'] %></pre></td>
-              <td><%= link_to url, url, target: :_blank %></td>
-            </tr>
-          <% end %>
-        <% end %>
+      <% @failed_results.each do |job:, filepath:, message:, lineno:, classname:, testname:| %>
+        <% url = "https://buildkite.com/rails/rails/builds/#{job.build_number}##{job.original_id}" %>
+        <tr>
+          <td><%= classname %></td>
+          <td><%= testname %></td>
+          <td><pre><%= message %></pre></td>
+          <td><pre><%= JSON.parse(FailedJob.first.data)['name'] %></pre></td>
+          <td><%= link_to url, url, target: :_blank %></td>
+        </tr>
       <% end %>
     </table>
   <% else %>
@@ -35,18 +31,18 @@
   <% end %>
 <%- end %>
 
-<% if @most_failed_tests %>
+<% if @failed_test_groups %>
   <table class="table table-bordered">
     <tr>
       <th>Test Name</th>
       <th>Failed Count</th>
       <th>Detail</th>
     </tr>
-    <% @most_failed_tests.each do |most_failed_test, failed_count| %>
+    <% @failed_test_groups.each do |group, failed_results| %>
       <tr>
-        <td><%= most_failed_test['testClass'] %>#<%= most_failed_test['method'] %></td>
-        <td><%= failed_count %></td>
-        <td><%= link_to 'detail', root_path(q: most_failed_test['method']) %></td>
+        <td><%= group[:classname] %>#<%= group[:testname] %></td>
+        <td><%= failed_results.count %></td>
+        <td><%= link_to 'detail', root_path(q: group[:testname]) %></td>
       </tr>
     <% end %>
   </table>

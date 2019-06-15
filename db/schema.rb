@@ -10,18 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_09_173352) do
+ActiveRecord::Schema.define(version: 2019_05_27_120041) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
 
   create_table "failed_jobs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.integer "original_id", null: false
+    t.uuid "original_id", null: false
     t.jsonb "data", null: false
+    t.text "log", null: false
+    t.jsonb "artifacts", null: false
+    t.datetime "original_created_at", null: false
     t.integer "build_number", null: false
     t.jsonb "build_data", null: false
-    t.jsonb "parse_result", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end

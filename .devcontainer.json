@@ -1,0 +1,14 @@
+// See https://aka.ms/vscode-remote/devcontainer.json for format details.
+{
+	"dockerComposeFile": [
+		"docker-compose.yml",
+		"docker-compose.vscode.yml"
+	],
+	"service": "web",
+	"workspaceFolder": "/app",
+	"extensions": [
+		"rebornix.ruby",
+		"castwide.solargraph"
+	],
+	"postCreateCommand": "cp -Tr /original /app && bin/setup"
+}

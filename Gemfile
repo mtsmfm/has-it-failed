@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '2.6.1'
+ruby '2.6.3'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 6.0.0.beta3'
@@ -30,7 +30,10 @@ gem 'bootsnap', '>= 1.4.1', require: false
 gem 'pry-rails'
 
 group :development, :test do
+  gem 'debase'
   gem 'pry-byebug'
+  gem 'ruby-debug-ide'
+  gem 'solargraph'
 end
 
 group :development do

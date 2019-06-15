@@ -1,0 +1,10 @@
+{
+    "ruby.useBundler": true,
+    "ruby.lint": {
+        "ruby": true
+    },
+    "solargraph.useBundler": true,
+    "solargraph.diagnostics": false,
+    "editor.formatOnSave": true,
+    "files.trimTrailingWhitespace": true
+}

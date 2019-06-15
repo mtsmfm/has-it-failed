@@ -3,46 +3,19 @@ class ImportFailedJobsJob < ApplicationJob
 
   def perform(from:, to:)
     bigquery = Google::Cloud::Bigquery.new
-    dataset = bigquery.dataset('rails_travis_result')
+    dataset = bigquery.dataset('rails_ci_result')
+
     data = dataset.query(<<~SQL)
-      CREATE TEMP FUNCTION extractCiResult (log STRING) RETURNS STRING LANGUAGE js AS
-      """
-        try {
-          const railsCiResult = (TravisResultParser.parse(log)).find(
-            command => command.includes('[Travis CI]')
-          );
-          return JSON.stringify(RailsCiParser.parse(railsCiResult));
-        } catch {
-          return 'error';
-        }
-      """
-      OPTIONS
-      (
-        library=[
-          "gs://rails-travis-result/parser/v0.1.0/rails_ci.js",
-          "gs://rails-travis-result/parser/v0.1.0/travis_result.js"
-        ]
-      );
-
-      CREATE TEMP FUNCTION JSON_ARRAY_LENGTH(str STRING) RETURNS NUMERIC LANGUAGE js AS
-      """
-        return JSON.parse(str).length
-      """;
-
-      SELECT * FROM(
-        SELECT DISTINCT id, data, build_number, build_data, extractCiResult(log) as parse_result
-        FROM `rails-travis-result.rails_travis_result.jobs` WHERE "#{from.iso8601}" < started_at AND started_at < "#{to.iso8601}"
-      ) WHERE parse_result <> "error" and JSON_EXTRACT_SCALAR(data, "$.state") = "failed" and JSON_ARRAY_LENGTH(JSON_EXTRACT(parse_result, "$.failedTests")) > 0
+      SELECT id as original_id, data, log, artifacts, created_at as original_created_at, build_number, build_data
+      FROM `rails-ci-result.rails_ci_result.buildkite_jobs`
+      WHERE "#{from.iso8601}" < created_at AND created_at < "#{to.iso8601}"
+      AND JSON_EXTRACT_SCALAR(build_data, "$.state") = "failed"
+      AND JSON_EXTRACT_SCALAR(build_data, "$.branch_name") = "master"
+      AND JSON_EXTRACT_SCALAR(data, "$.passed") = "false"
+      AND JSON_EXTRACT_SCALAR(data, "$.soft_failed") = "false"
+      AND artifacts <> "[]"
     SQL
 
-    data.each do |row|
-      FailedJob.create!(
-        original_id: row[:id],
-        data: JSON.parse(row[:data]),
-        build_number: row[:build_number],
-        build_data: JSON.parse(row[:build_data]),
-        parse_result: JSON.parse(row[:parse_result]),
-      )
-    end
+    FailedJob.insert_all!(data.map {|d| d.merge(created_at: Time.zone.now, updated_at: Time.zone.now) })
   end
 end
