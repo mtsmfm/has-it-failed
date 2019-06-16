@@ -1,7 +1,7 @@
 class RootController < ApplicationController
   def index
     results = Rails.cache.fetch(:results, expires_in: 10.minutes) do
-      FailedJob.select(:id, :original_id, :data, :artifacts, :build_number).flat_map do |job|
+      FailedJob.select(:id, :original_id, :data, :artifacts, :build_number, :build_data).flat_map do |job|
         JSON.parse(job.artifacts).flat_map {|a| Nokogiri::XML.parse(a['body']).xpath("//failure | //error") }.flat_map do |failure_or_error|
           {
             job: job,

@@ -13,16 +13,19 @@
         <th>Test Method</th>
         <th>Message</th>
         <th>Command</th>
-        <th>TravisCI build URL</th>
+        <th>Test Code URL</th>
+        <th>Build URL</th>
       </tr>
       <% @failed_results.each do |job:, filepath:, message:, lineno:, classname:, testname:| %>
-        <% url = "https://buildkite.com/rails/rails/builds/#{job.build_number}##{job.original_id}" %>
+        <% build_url = "https://buildkite.com/rails/rails/builds/#{job.build_number}##{job.original_id}" %>
+        <% code_url = "https://github.com/rails/rails/blob/#{JSON.parse(job.build_data)['commit_id']}/#{filepath.sub('/rails/', '')}#L#{lineno}" %>
         <tr>
           <td><%= classname %></td>
           <td><%= testname %></td>
           <td><pre><%= message %></pre></td>
-          <td><pre><%= JSON.parse(FailedJob.first.data)['name'] %></pre></td>
-          <td><%= link_to url, url, target: :_blank %></td>
+          <td><pre><%= JSON.parse(job.data)['name'] %></pre></td>
+          <td><%= link_to code_url, code_url, target: :_blank %></td>
+          <td><%= link_to build_url, build_url, target: :_blank %></td>
         </tr>
       <% end %>
     </table>
